@@ -3,32 +3,43 @@
  * Do not edit manually.
  * Api
  * SmogNet Air Quality Intelligence API
- * OpenAPI spec version: 0.1.0
+ * OpenAPI spec version: 0.2.0
  */
 import {
+  useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
+  MutationFunction,
   QueryFunction,
   QueryKey,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query';
 
 import type {
+  AiInsights,
   Alert,
+  CityComparisonPoint,
   CityRanking,
   CityStats,
   GetAlertsParams,
+  GetCityComparisonParams,
   GetClassificationsParams,
+  GetHourlyPatternsParams,
   GetPollutantTrendsParams,
   GetReadingsParams,
   GetSourceDistributionParams,
   GetSpikesParams,
   GetTimelineParams,
   HealthStatus,
+  HourlyPattern,
   NationalStats,
   PollutantTrendPoint,
+  PredictionRequest,
+  PredictionResult,
   ReadingsPage,
   SourceClassification,
   SourceDistributionItem,
@@ -37,7 +48,7 @@ import type {
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
-import type { ErrorType } from '../custom-fetch';
+import type { ErrorType , BodyType } from '../custom-fetch';
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -57,7 +68,6 @@ export const getHealthCheckUrl = () => {
 }
 
 /**
- * Returns server health status
  * @summary Health check
  */
 export const healthCheck = async ( options?: RequestInit): Promise<HealthStatus> => {
@@ -135,7 +145,6 @@ export const getGetStatsUrl = () => {
 }
 
 /**
- * National-level air quality KPIs and aggregates
  * @summary Get national statistics
  */
 export const getStats = async ( options?: RequestInit): Promise<NationalStats> => {
@@ -213,7 +222,6 @@ export const getGetCityStatsUrl = () => {
 }
 
 /**
- * Aggregated air quality statistics per city
  * @summary Get per-city statistics
  */
 export const getCityStats = async ( options?: RequestInit): Promise<CityStats[]> => {
@@ -382,7 +390,7 @@ export const getGetSpikesUrl = (params?: GetSpikesParams,) => {
 }
 
 /**
- * @summary Get detected anomalies / pollution spikes
+ * @summary Get detected anomalies
  */
 export const getSpikes = async (params?: GetSpikesParams, options?: RequestInit): Promise<Spike[]> => {
 
@@ -429,7 +437,7 @@ export type GetSpikesQueryError = ErrorType<unknown>
 
 
 /**
- * @summary Get detected anomalies / pollution spikes
+ * @summary Get detected anomalies
  */
 
 export function useGetSpikes<TData = Awaited<ReturnType<typeof getSpikes>>, TError = ErrorType<unknown>>(
@@ -634,7 +642,7 @@ export const getGetTimelineUrl = (params?: GetTimelineParams,) => {
 }
 
 /**
- * @summary Get anomaly timeline (hourly spike counts)
+ * @summary Get anomaly timeline
  */
 export const getTimeline = async (params?: GetTimelineParams, options?: RequestInit): Promise<TimelineEntry[]> => {
 
@@ -681,7 +689,7 @@ export type GetTimelineQueryError = ErrorType<unknown>
 
 
 /**
- * @summary Get anomaly timeline (hourly spike counts)
+ * @summary Get anomaly timeline
  */
 
 export function useGetTimeline<TData = Awaited<ReturnType<typeof getTimeline>>, TError = ErrorType<unknown>>(
@@ -802,7 +810,7 @@ export const getGetSourceDistributionUrl = (params?: GetSourceDistributionParams
 }
 
 /**
- * @summary Get pollution source distribution (for pie chart)
+ * @summary Get pollution source distribution
  */
 export const getSourceDistribution = async (params?: GetSourceDistributionParams, options?: RequestInit): Promise<SourceDistributionItem[]> => {
 
@@ -849,7 +857,7 @@ export type GetSourceDistributionQueryError = ErrorType<unknown>
 
 
 /**
- * @summary Get pollution source distribution (for pie chart)
+ * @summary Get pollution source distribution
  */
 
 export function useGetSourceDistribution<TData = Awaited<ReturnType<typeof getSourceDistribution>>, TError = ErrorType<unknown>>(
@@ -935,6 +943,322 @@ export function useGetCityRankings<TData = Awaited<ReturnType<typeof getCityRank
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetCityRankingsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetAiInsightsUrl = () => {
+
+
+
+
+  return `/api/air-quality/ai-insights`
+}
+
+/**
+ * @summary Get AI-generated intelligent insights
+ */
+export const getAiInsights = async ( options?: RequestInit): Promise<AiInsights> => {
+
+  return customFetch<AiInsights>(getGetAiInsightsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAiInsightsQueryKey = () => {
+    return [
+    `/api/air-quality/ai-insights`
+    ] as const;
+    }
+
+
+export const getGetAiInsightsQueryOptions = <TData = Awaited<ReturnType<typeof getAiInsights>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAiInsights>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAiInsightsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAiInsights>>> = ({ signal }) => getAiInsights({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAiInsights>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAiInsightsQueryResult = NonNullable<Awaited<ReturnType<typeof getAiInsights>>>
+export type GetAiInsightsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get AI-generated intelligent insights
+ */
+
+export function useGetAiInsights<TData = Awaited<ReturnType<typeof getAiInsights>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAiInsights>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAiInsightsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetHourlyPatternsUrl = (params?: GetHourlyPatternsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/air-quality/hourly-patterns?${stringifiedParams}` : `/api/air-quality/hourly-patterns`
+}
+
+/**
+ * @summary Get average pollutant levels by hour of day
+ */
+export const getHourlyPatterns = async (params?: GetHourlyPatternsParams, options?: RequestInit): Promise<HourlyPattern[]> => {
+
+  return customFetch<HourlyPattern[]>(getGetHourlyPatternsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetHourlyPatternsQueryKey = (params?: GetHourlyPatternsParams,) => {
+    return [
+    `/api/air-quality/hourly-patterns`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetHourlyPatternsQueryOptions = <TData = Awaited<ReturnType<typeof getHourlyPatterns>>, TError = ErrorType<unknown>>(params?: GetHourlyPatternsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getHourlyPatterns>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetHourlyPatternsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getHourlyPatterns>>> = ({ signal }) => getHourlyPatterns(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getHourlyPatterns>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetHourlyPatternsQueryResult = NonNullable<Awaited<ReturnType<typeof getHourlyPatterns>>>
+export type GetHourlyPatternsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get average pollutant levels by hour of day
+ */
+
+export function useGetHourlyPatterns<TData = Awaited<ReturnType<typeof getHourlyPatterns>>, TError = ErrorType<unknown>>(
+ params?: GetHourlyPatternsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getHourlyPatterns>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetHourlyPatternsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreatePredictionUrl = () => {
+
+
+
+
+  return `/api/air-quality/predictions`
+}
+
+/**
+ * @summary Generate live AI pollution prediction
+ */
+export const createPrediction = async (predictionRequest: PredictionRequest, options?: RequestInit): Promise<PredictionResult> => {
+
+  return customFetch<PredictionResult>(getCreatePredictionUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      predictionRequest,)
+  }
+);}
+
+
+
+
+export const getCreatePredictionMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createPrediction>>, TError,{data: BodyType<PredictionRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createPrediction>>, TError,{data: BodyType<PredictionRequest>}, TContext> => {
+
+const mutationKey = ['createPrediction'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createPrediction>>, {data: BodyType<PredictionRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createPrediction(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreatePredictionMutationResult = NonNullable<Awaited<ReturnType<typeof createPrediction>>>
+    export type CreatePredictionMutationBody = BodyType<PredictionRequest>
+    export type CreatePredictionMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Generate live AI pollution prediction
+ */
+export const useCreatePrediction = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createPrediction>>, TError,{data: BodyType<PredictionRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createPrediction>>,
+        TError,
+        {data: BodyType<PredictionRequest>},
+        TContext
+      > => {
+      return useMutation(getCreatePredictionMutationOptions(options));
+    }
+
+export const getGetCityComparisonUrl = (params?: GetCityComparisonParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/air-quality/city-comparison?${stringifiedParams}` : `/api/air-quality/city-comparison`
+}
+
+/**
+ * @summary Get multi-city comparison data for radar chart
+ */
+export const getCityComparison = async (params?: GetCityComparisonParams, options?: RequestInit): Promise<CityComparisonPoint[]> => {
+
+  return customFetch<CityComparisonPoint[]>(getGetCityComparisonUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCityComparisonQueryKey = (params?: GetCityComparisonParams,) => {
+    return [
+    `/api/air-quality/city-comparison`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetCityComparisonQueryOptions = <TData = Awaited<ReturnType<typeof getCityComparison>>, TError = ErrorType<unknown>>(params?: GetCityComparisonParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCityComparison>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCityComparisonQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCityComparison>>> = ({ signal }) => getCityComparison(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCityComparison>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCityComparisonQueryResult = NonNullable<Awaited<ReturnType<typeof getCityComparison>>>
+export type GetCityComparisonQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get multi-city comparison data for radar chart
+ */
+
+export function useGetCityComparison<TData = Awaited<ReturnType<typeof getCityComparison>>, TError = ErrorType<unknown>>(
+ params?: GetCityComparisonParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCityComparison>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCityComparisonQueryOptions(params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

@@ -3,22 +3,32 @@
  * Do not edit manually.
  * Api
  * SmogNet Air Quality Intelligence API
- * OpenAPI spec version: 0.1.0
+ * OpenAPI spec version: 0.2.0
  */
 
+export * from './aiInsights';
+export * from './aiInsightsInsightsItem';
 export * from './alert';
+export * from './cityComparisonPoint';
 export * from './cityRanking';
 export * from './cityStats';
 export * from './getAlertsParams';
+export * from './getCityComparisonParams';
 export * from './getClassificationsParams';
+export * from './getHourlyPatternsParams';
 export * from './getPollutantTrendsParams';
 export * from './getReadingsParams';
 export * from './getSourceDistributionParams';
 export * from './getSpikesParams';
 export * from './getTimelineParams';
 export * from './healthStatus';
+export * from './hourlyPattern';
 export * from './nationalStats';
 export * from './pollutantTrendPoint';
+export * from './predictionRequest';
+export * from './predictionResult';
+export * from './predictionResultFactorsItem';
+export * from './predictionResultHourlyForecastItem';
 export * from './reading';
 export * from './readingsPage';
 export * from './sourceClassification';

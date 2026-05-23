@@ -3,13 +3,12 @@
  * Do not edit manually.
  * Api
  * SmogNet Air Quality Intelligence API
- * OpenAPI spec version: 0.1.0
+ * OpenAPI spec version: 0.2.0
  */
 import * as zod from 'zod';
 
 
 /**
- * Returns server health status
  * @summary Health check
  */
 export const HealthCheckResponse = zod.object({
@@ -18,7 +17,6 @@ export const HealthCheckResponse = zod.object({
 
 
 /**
- * National-level air quality KPIs and aggregates
  * @summary Get national statistics
  */
 export const GetStatsResponse = zod.object({
@@ -30,12 +28,14 @@ export const GetStatsResponse = zod.object({
   "totalAlerts": zod.number(),
   "criticalCities": zod.number(),
   "mostPollutedCity": zod.string(),
-  "cleanestCity": zod.string()
+  "cleanestCity": zod.string(),
+  "dominantSource": zod.string(),
+  "weeklyTrend": zod.string(),
+  "peakHour": zod.number()
 })
 
 
 /**
- * Aggregated air quality statistics per city
  * @summary Get per-city statistics
  */
 export const GetCityStatsResponseItem = zod.object({
@@ -88,7 +88,7 @@ export const GetReadingsResponse = zod.object({
 
 
 /**
- * @summary Get detected anomalies / pollution spikes
+ * @summary Get detected anomalies
  */
 export const getSpikesQueryLimitDefault = 50;
 
@@ -148,7 +148,7 @@ export const GetClassificationsResponse = zod.array(GetClassificationsResponseIt
 
 
 /**
- * @summary Get anomaly timeline (hourly spike counts)
+ * @summary Get anomaly timeline
  */
 export const getTimelineQueryDaysDefault = 30;
 
@@ -187,7 +187,7 @@ export const GetPollutantTrendsResponse = zod.array(GetPollutantTrendsResponseIt
 
 
 /**
- * @summary Get pollution source distribution (for pie chart)
+ * @summary Get pollution source distribution
  */
 export const GetSourceDistributionQueryParams = zod.object({
   "city": zod.coerce.string().optional()
@@ -214,5 +214,105 @@ export const GetCityRankingsResponseItem = zod.object({
   "spikeCount": zod.number()
 })
 export const GetCityRankingsResponse = zod.array(GetCityRankingsResponseItem)
+
+
+/**
+ * @summary Get AI-generated intelligent insights
+ */
+export const GetAiInsightsResponse = zod.object({
+  "mostPollutedCity": zod.string(),
+  "cleanestCity": zod.string(),
+  "highRiskHour": zod.number(),
+  "highRiskHourAqi": zod.number(),
+  "dominantSource": zod.string(),
+  "dominantSourcePct": zod.number(),
+  "weeklyTrend": zod.string(),
+  "weeklyTrendPct": zod.number(),
+  "anomalyHotspot": zod.string(),
+  "anomalyHotspotCount": zod.number(),
+  "seasonalNote": zod.string(),
+  "riskLevel": zod.string(),
+  "insights": zod.array(zod.object({
+  "icon": zod.string(),
+  "title": zod.string(),
+  "detail": zod.string(),
+  "severity": zod.string()
+}))
+})
+
+
+/**
+ * @summary Get average pollutant levels by hour of day
+ */
+export const GetHourlyPatternsQueryParams = zod.object({
+  "city": zod.coerce.string().optional()
+})
+
+export const GetHourlyPatternsResponseItem = zod.object({
+  "hour": zod.number(),
+  "pm25": zod.number(),
+  "pm10": zod.number(),
+  "aqi": zod.number(),
+  "city": zod.string().nullish(),
+  "isPeak": zod.boolean()
+})
+export const GetHourlyPatternsResponse = zod.array(GetHourlyPatternsResponseItem)
+
+
+/**
+ * @summary Generate live AI pollution prediction
+ */
+export const CreatePredictionBody = zod.object({
+  "city": zod.string(),
+  "targetHour": zod.number(),
+  "daysAhead": zod.number(),
+  "pollutant": zod.string()
+})
+
+export const CreatePredictionResponse = zod.object({
+  "city": zod.string(),
+  "targetHour": zod.number(),
+  "daysAhead": zod.number(),
+  "pollutant": zod.string(),
+  "predictedAqi": zod.number(),
+  "predictedPm25": zod.number(),
+  "predictedPm10": zod.number(),
+  "confidence": zod.number(),
+  "severity": zod.string(),
+  "trend": zod.string(),
+  "riskProbability": zod.number(),
+  "recommendation": zod.string(),
+  "hourlyForecast": zod.array(zod.object({
+  "hour": zod.number(),
+  "aqi": zod.number(),
+  "pm25": zod.number()
+})),
+  "factors": zod.array(zod.object({
+  "factor": zod.string(),
+  "weight": zod.number(),
+  "description": zod.string()
+}))
+})
+
+
+/**
+ * @summary Get multi-city comparison data for radar chart
+ */
+export const GetCityComparisonQueryParams = zod.object({
+  "cities": zod.coerce.string().optional().describe('Comma-separated list of city names')
+})
+
+export const GetCityComparisonResponseItem = zod.object({
+  "metric": zod.string(),
+  "Lahore": zod.number().optional(),
+  "Karachi": zod.number().optional(),
+  "Islamabad": zod.number().optional(),
+  "Peshawar": zod.number().optional(),
+  "Multan": zod.number().optional(),
+  "Faisalabad": zod.number().optional(),
+  "Quetta": zod.number().optional(),
+  "Rawalpindi": zod.number().optional()
+})
+export const GetCityComparisonResponse = zod.array(GetCityComparisonResponseItem)
 
 

@@ -6,7 +6,9 @@
  * OpenAPI spec version: 0.2.0
  */
 
-export type GetAlertsParams = {
-city?: string;
-severity?: string;
-};
+export interface PredictionRequest {
+  city: string;
+  targetHour: number;
+  daysAhead: number;
+  pollutant: string;
+}

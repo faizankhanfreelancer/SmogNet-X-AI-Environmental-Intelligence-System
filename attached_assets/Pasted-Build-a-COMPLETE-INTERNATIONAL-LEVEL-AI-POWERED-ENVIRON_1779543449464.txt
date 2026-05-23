@@ -1,0 +1,450 @@
+Build a COMPLETE INTERNATIONAL-LEVEL AI-POWERED ENVIRONMENTAL INTELLIGENCE PLATFORM called:
+
+# SmogNet
+AI-Powered Air Quality Intelligence System for Pakistan
+
+This should be a FULL PROFESSIONAL END-TO-END DATA SCIENCE + AI + GIS + REAL-TIME ANALYTICS PLATFORM suitable for:
+- International hackathons
+- Datathons
+- AI competitions
+- University final year projects
+- Enterprise AI showcase
+- Government environmental monitoring systems
+
+The project must look PREMIUM, MODERN, FUTURISTIC, and ENTERPRISE-LEVEL.
+
+========================================================
+MAIN PROJECT OBJECTIVE
+========================================================
+
+The system must analyze Pakistan air quality data and intelligently:
+1. Detect pollution anomalies
+2. Identify pollution sources
+3. Generate public health alerts
+4. Predict future pollution levels
+5. Visualize pollution on interactive GIS maps
+6. Provide real-time analytics dashboards
+7. Allow city-wise live pollution monitoring
+8. Support dynamic filtering and AI insights
+
+The final system should feel like a REAL NATIONAL AIR QUALITY COMMAND CENTER.
+
+========================================================
+PROJECT ARCHITECTURE
+========================================================
+
+Create a COMPLETE modular architecture:
+
+PROJECT STRUCTURE:
+
+SmogNet/
+│
+├── app.py
+├── requirements.txt
+├── README.md
+├── pipeline.py
+├── detector.py
+├── classifier.py
+├── predictor.py
+├── alert_generator.py
+├── utils/
+├── data/
+├── assets/
+├── models/
+├── pages/
+├── components/
+├── geojson/
+├── charts/
+├── outputs/
+└── styles/
+
+========================================================
+CORE FEATURES
+========================================================
+
+The platform must include ALL of the following:
+
+========================================================
+1. DATA PREPROCESSING PIPELINE
+========================================================
+
+Implement:
+- Missing value handling
+- Duplicate removal
+- Timestamp normalization
+- City extraction
+- Season extraction
+- Pollutant normalization
+- Outlier handling
+- Feature engineering
+
+Use:
+- Pandas
+- NumPy
+
+Create:
+- clean_dataset.csv
+- train/test split
+- processed features
+
+========================================================
+2. ANOMALY DETECTION SYSTEM
+========================================================
+
+Detect abnormal pollution spikes using AI.
+
+Implement:
+- Rolling statistical baseline
+- Isolation Forest
+- Spike detection engine
+- Dynamic thresholding
+- Season-aware analysis
+- City-specific anomaly analysis
+
+Detect:
+- PM2.5 spikes
+- PM10 spikes
+- NO2 anomalies
+- SO2 anomalies
+- CO anomalies
+
+Output:
+- spikes_detected.csv
+- anomaly scores
+- spike timeline
+
+Visualize:
+- anomaly graphs
+- spike markers
+- real-time detection charts
+
+========================================================
+3. SOURCE CLASSIFICATION ENGINE
+========================================================
+
+Classify pollution source intelligently.
+
+Detect:
+- Crop Burning
+- Vehicular Emissions
+- Industrial Pollution
+- Dust Storms
+- Mixed Pollution
+
+Implement:
+- Rule-based classification
+- Random Forest classifier
+- Hybrid AI classification system
+
+Use features:
+- PM2.5
+- PM10
+- NO
+- NO2
+- NH3
+- CO
+- SO2
+- pollutant ratios
+- hour
+- city
+- season
+
+Generate:
+- confidence scores
+- feature importance analysis
+- classification summary charts
+
+========================================================
+4. AI ALERT GENERATION SYSTEM
+========================================================
+
+Generate human-readable public health alerts.
+
+Requirements:
+- Simple language
+- No technical jargon
+- Mention:
+  - city
+  - pollution source
+  - health risks
+  - safety actions
+
+Generate:
+- English alerts
+- Urdu alerts
+- Alert severity levels
+
+Example:
+“Air quality in Lahore has reached hazardous levels due to crop burning activities. Children, elderly people, and asthma patients should avoid outdoor activities and wear masks.”
+
+========================================================
+5. LIVE POLLUTION PREDICTION SYSTEM
+========================================================
+
+Build a prediction engine that forecasts future pollution conditions.
+
+Allow users to:
+- select city
+- select hour
+- select date
+- select pollutant
+
+Predict:
+- AQI
+- severity
+- pollution trends
+- future spikes
+- risk probability
+
+Implement:
+- Random Forest Regression
+- XGBoost
+- Time-series forecasting
+
+Show:
+- prediction confidence
+- future graphs
+- trend forecasts
+
+========================================================
+6. INTERACTIVE GIS MAP SYSTEM
+========================================================
+
+Build a PROFESSIONAL GIS-STYLE INTERACTIVE MAP.
+
+Use:
+- Plotly Mapbox
+- Choropleth maps
+- GeoJSON
+- Heatmaps
+
+Features:
+- Pakistan map
+- city-level visualization
+- district coloring
+- pollution heatmap
+- hotspot detection
+- real-time updates
+- animated transitions
+
+Users can:
+- click cities
+- hover regions
+- filter locations
+
+Map should display:
+- AQI
+- PM2.5
+- severity
+- source label
+- alerts
+
+Color system:
+- Green → Safe
+- Yellow → Moderate
+- Orange → Unhealthy
+- Red → Hazardous
+- Dark Red → Extreme
+
+========================================================
+7. ADVANCED DASHBOARD SYSTEM
+========================================================
+
+Create a PREMIUM MODERN AI DASHBOARD.
+
+Use:
+- Streamlit
+- Plotly
+- Custom CSS
+- Glassmorphism UI
+
+Dashboard sections:
+
+1. Overview Page
+2. Live Prediction Page
+3. Interactive GIS Map
+4. Anomaly Analysis
+5. Source Classification
+6. Alert Center
+7. City Comparison
+8. Historical Trends
+9. AI Insights Panel
+
+========================================================
+8. LIVE PREDICTION PAGE
+========================================================
+
+Create a dedicated page called:
+“Live Prediction”
+
+Features:
+- city selector
+- date selector
+- hour selector
+- pollutant selector
+- severity filter
+
+Add button:
+“Predict Live Pollution”
+
+When clicked:
+- dynamically generate prediction
+- update graphs
+- show AI insights
+- display future AQI
+
+Show:
+- KPI cards
+- prediction charts
+- trend analysis
+- anomaly probability
+- risk indicators
+
+========================================================
+9. REAL-TIME EXPERIENCE
+========================================================
+
+Implement simulated real-time monitoring.
+
+Features:
+- auto-refresh dashboard
+- changing AQI
+- dynamic charts
+- live alerts
+- animated metrics
+- streaming-style updates
+
+========================================================
+10. ADVANCED VISUALIZATIONS
+========================================================
+
+Generate:
+- line charts
+- area charts
+- heatmaps
+- choropleth maps
+- pie charts
+- donut charts
+- radar charts
+- anomaly timelines
+- pollution trend graphs
+
+Use:
+- Plotly
+- Matplotlib
+
+========================================================
+11. FILTERING SYSTEM
+========================================================
+
+Allow filtering by:
+- city
+- pollutant
+- severity
+- source type
+- date
+- month
+- hour
+
+Support:
+- all cities
+- individual city analysis
+
+========================================================
+12. AI INSIGHTS ENGINE
+========================================================
+
+Generate intelligent insights automatically.
+
+Examples:
+- Most polluted city
+- Highest risk hour
+- Seasonal pollution behavior
+- Pollution increase trends
+- High-risk zones
+- Prediction confidence
+
+========================================================
+13. UI/UX REQUIREMENTS
+========================================================
+
+The UI must look:
+- futuristic
+- AI-powered
+- enterprise-level
+- premium
+- modern SaaS platform
+
+Use:
+- dark theme
+- cyan/blue gradients
+- glassmorphism cards
+- responsive layout
+- sidebar navigation
+- smooth animations
+- premium typography
+
+========================================================
+14. PRESENTATION-READY FEATURES
+========================================================
+
+The project should include:
+- screenshots
+- charts
+- architecture diagrams
+- workflow visualization
+- professional README
+- methodology documentation
+
+========================================================
+15. README REQUIREMENTS
+========================================================
+
+Generate a COMPLETE professional README including:
+- project overview
+- features
+- installation
+- technologies
+- workflow
+- screenshots
+- architecture
+- future improvements
+
+========================================================
+16. DEPLOYMENT SUPPORT
+========================================================
+
+Prepare the project for:
+- Replit
+- Streamlit Cloud
+- GitHub deployment
+
+Generate:
+- requirements.txt
+- deployment instructions
+
+========================================================
+17. FINAL OUTPUT REQUIREMENTS
+========================================================
+
+Generate COMPLETE WORKING IMPLEMENTATION including:
+- full source code
+- professional UI
+- modular architecture
+- AI models
+- dashboards
+- prediction engine
+- GIS maps
+- alert system
+- charts
+- filters
+- styling
+- documentation
+
+The final result should look like:
+- NASA-style monitoring dashboard
+- Government environmental intelligence system
+- International AI hackathon winning project
+- Enterprise AI SaaS platform
+
+The project must be visually stunning, highly interactive, technically strong, and presentation-ready.

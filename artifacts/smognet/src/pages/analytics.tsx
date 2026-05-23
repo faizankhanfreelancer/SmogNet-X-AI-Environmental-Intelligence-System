@@ -5,11 +5,13 @@ import {
   useGetPollutantTrends, 
   getGetPollutantTrendsQueryKey,
   useGetSourceDistribution,
-  getGetSourceDistributionQueryKey
+  getGetSourceDistributionQueryKey,
+  useGetHourlyPatterns,
+  getGetHourlyPatternsQueryKey
 } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, BarChart, Bar } from "recharts";
 
 const CITIES = ["Lahore", "Karachi", "Islamabad", "Peshawar", "Multan", "Faisalabad", "Quetta", "Rawalpindi"];
 const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
@@ -27,38 +29,45 @@ export default function Analytics() {
     { query: { queryKey: getGetSourceDistributionQueryKey({ city: selectedCity }) } }
   );
 
-  if (trendsLoading || sourcesLoading) return <Layout><LoadingState /></Layout>;
-  if (trendsError || sourcesError) return <Layout><ErrorState /></Layout>;
+  const { data: hourlyPatterns, isLoading: hourlyLoading, error: hourlyError } = useGetHourlyPatterns(
+    { city: selectedCity },
+    { query: { queryKey: getGetHourlyPatternsQueryKey({ city: selectedCity }) } }
+  );
+
+  if (trendsLoading || sourcesLoading || hourlyLoading) return <Layout><LoadingState /></Layout>;
+  if (trendsError || sourcesError || hourlyError) return <Layout><ErrorState /></Layout>;
 
   return (
     <Layout>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight">DATA_ANALYTICS</h2>
-            <p className="text-muted-foreground mt-1">Detailed telemetry and source apportionment</p>
+        <div className="scan-line-container border-b border-primary/20 pb-4 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-3xl font-bold tracking-tight">DATA_ANALYTICS</h2>
+              <p className="text-muted-foreground mt-1">Detailed telemetry and source apportionment</p>
+            </div>
+            
+            <Select value={selectedCity || "all"} onValueChange={(val) => setSelectedCity(val === "all" ? undefined : val)}>
+              <SelectTrigger className="w-[200px] border-primary/30">
+                <SelectValue placeholder="Select Zone" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">ALL_ZONES</SelectItem>
+                {CITIES.map(city => (
+                  <SelectItem key={city} value={city}>{city.toUpperCase()}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          
-          <Select value={selectedCity || "all"} onValueChange={(val) => setSelectedCity(val === "all" ? undefined : val)}>
-            <SelectTrigger className="w-[200px] border-primary/30">
-              <SelectValue placeholder="Select Zone" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">ALL_ZONES</SelectItem>
-              {CITIES.map(city => (
-                <SelectItem key={city} value={city}>{city.toUpperCase()}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="bg-card/50 border-primary/20 col-span-1 lg:col-span-2">
+          <Card className="glass-card col-span-1 lg:col-span-2">
             <CardHeader>
               <CardTitle className="text-lg font-mono">POLLUTANT_CONCENTRATION (30D)</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[400px]">
+              <div className="h-[450px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={trends}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
@@ -70,7 +79,7 @@ export default function Analytics() {
                     />
                     <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
                     <Tooltip 
-                      contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))' }}
+                      contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', fontFamily: 'monospace' }}
                       itemStyle={{ color: 'hsl(var(--foreground))' }}
                     />
                     <Legend />
@@ -83,12 +92,12 @@ export default function Analytics() {
             </CardContent>
           </Card>
 
-          <Card className="bg-card/50 border-primary/20">
+          <Card className="glass-card">
             <CardHeader>
               <CardTitle className="text-lg font-mono">SOURCE_APPORTIONMENT</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px]">
+              <div className="h-[350px]">
                 {sources && sources.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -107,7 +116,7 @@ export default function Analytics() {
                         ))}
                       </Pie>
                       <Tooltip 
-                        contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))' }}
+                        contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', fontFamily: 'monospace' }}
                         itemStyle={{ color: 'hsl(var(--foreground))' }}
                         formatter={(value: number) => [`${value.toFixed(1)}%`, 'Percentage']}
                       />
@@ -115,7 +124,45 @@ export default function Analytics() {
                     </PieChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="h-full flex items-center justify-center text-muted-foreground">NO_DATA_AVAILABLE</div>
+                  <div className="h-full flex items-center justify-center text-muted-foreground font-mono">NO_DATA_AVAILABLE</div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="glass-card">
+            <CardHeader>
+              <CardTitle className="text-lg font-mono">HOURLY_POLLUTION_PATTERN</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[350px]">
+                {hourlyPatterns && hourlyPatterns.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={hourlyPatterns}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                      <XAxis 
+                        dataKey="hour" 
+                        stroke="hsl(var(--muted-foreground))"
+                        fontSize={12}
+                        tickFormatter={(val) => `${val}:00`}
+                      />
+                      <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', fontFamily: 'monospace' }}
+                        cursor={{ fill: 'hsl(var(--muted)/0.2)' }}
+                      />
+                      <Bar dataKey="avgAqi" name="Avg AQI" radius={[4, 4, 0, 0]}>
+                        {hourlyPatterns.map((entry, index) => (
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={entry.isPeak ? 'hsl(var(--destructive))' : 'hsl(var(--chart-1))'} 
+                          />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full flex items-center justify-center text-muted-foreground font-mono">NO_DATA_AVAILABLE</div>
                 )}
               </div>
             </CardContent>

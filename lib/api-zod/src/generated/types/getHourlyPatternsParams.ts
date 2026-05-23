@@ -6,7 +6,6 @@
  * OpenAPI spec version: 0.2.0
  */
 
-export type GetAlertsParams = {
+export type GetHourlyPatternsParams = {
 city?: string;
-severity?: string;
 };

@@ -11,6 +11,9 @@ import Sources from "@/pages/sources";
 import Alerts from "@/pages/alerts";
 import Cities from "@/pages/cities";
 import MapPage from "@/pages/map";
+import Prediction from "@/pages/prediction";
+import Compare from "@/pages/compare";
+import Insights from "@/pages/insights";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +27,9 @@ function Router() {
       <Route path="/alerts" component={Alerts} />
       <Route path="/cities" component={Cities} />
       <Route path="/map" component={MapPage} />
+      <Route path="/prediction" component={Prediction} />
+      <Route path="/compare" component={Compare} />
+      <Route path="/insights" component={Insights} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -117,6 +117,45 @@
   --radius: 0rem;
 }
 
+@keyframes scanline {
+  0% { transform: translateY(-100%); opacity: 0; }
+  50% { opacity: 0.1; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+
+@keyframes data-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.02); opacity: 0.8; }
+}
+
+.scan-line-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.scan-line-container::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to bottom, transparent, rgba(0, 180, 220, 0.2), transparent);
+  animation: scanline 3s linear infinite;
+  pointer-events: none;
+}
+
+.glass-card {
+  background: rgba(26, 30, 35, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 180, 220, 0.2);
+}
+
+.primary-glow {
+  box-shadow: 0 0 20px rgba(0, 180, 220, 0.15);
+}
+
+.data-pulse {
+  animation: data-pulse 2s ease-in-out infinite;
+}
+
 @layer base {
   * {
     @apply border-border;

@@ -6,7 +6,10 @@ import {
   Factory, 
   Map as MapIcon, 
   Radar, 
-  Building2 
+  Building2,
+  Cpu,
+  BarChart3,
+  Brain
 } from "lucide-react";
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -20,6 +23,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
     { href: "/alerts", label: "Alerts", icon: AlertTriangle },
     { href: "/cities", label: "Cities", icon: Building2 },
     { href: "/map", label: "Map", icon: MapIcon },
+    { href: "/prediction", label: "Live Prediction", icon: Cpu },
+    { href: "/compare", label: "Compare", icon: BarChart3 },
+    { href: "/insights", label: "AI Insights", icon: Brain },
   ];
 
   return (
@@ -30,6 +36,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <div className="text-xs text-muted-foreground mt-1 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
             SYS_ONLINE
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-1 tracking-widest">
+            8 ZONES MONITORED
           </div>
         </div>
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
@@ -49,7 +58,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           ))}
         </nav>
         <div className="p-4 border-t border-border text-xs text-muted-foreground">
-          v1.0.4-STABLE
+          v2.0.0-AI
         </div>
       </aside>
       <main className="flex-1 overflow-y-auto bg-background p-8">

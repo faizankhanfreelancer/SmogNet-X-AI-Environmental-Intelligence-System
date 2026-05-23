@@ -6,10 +6,12 @@
  * OpenAPI spec version: 0.2.0
  */
 
-export interface TimelineEntry {
-  date: string;
-  spikeCount: number;
-  avgAqi: number;
+export interface HourlyPattern {
+  hour: number;
+  pm25: number;
+  pm10: number;
+  aqi: number;
   /** @nullable */
   city?: string | null;
+  isPeak: boolean;
 }

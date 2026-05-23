@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
-  version: 0.1.0
+  version: 0.2.0
   description: SmogNet Air Quality Intelligence API
 servers:
   - url: /api
@@ -18,7 +18,6 @@ paths:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -32,7 +31,6 @@ paths:
       operationId: getStats
       tags: [air-quality]
       summary: Get national statistics
-      description: National-level air quality KPIs and aggregates
       responses:
         "200":
           description: National statistics
@@ -46,7 +44,6 @@ paths:
       operationId: getCityStats
       tags: [air-quality]
       summary: Get per-city statistics
-      description: Aggregated air quality statistics per city
       responses:
         "200":
           description: City statistics array
@@ -89,7 +86,7 @@ paths:
     get:
       operationId: getSpikes
       tags: [air-quality]
-      summary: Get detected anomalies / pollution spikes
+      summary: Get detected anomalies
       parameters:
         - name: city
           in: query
@@ -158,7 +155,7 @@ paths:
     get:
       operationId: getTimeline
       tags: [air-quality]
-      summary: Get anomaly timeline (hourly spike counts)
+      summary: Get anomaly timeline
       parameters:
         - name: city
           in: query
@@ -208,7 +205,7 @@ paths:
     get:
       operationId: getSourceDistribution
       tags: [air-quality]
-      summary: Get pollution source distribution (for pie chart)
+      summary: Get pollution source distribution
       parameters:
         - name: city
           in: query
@@ -239,6 +236,79 @@ paths:
                 items:
                   $ref: "#/components/schemas/CityRanking"
 
+  /air-quality/ai-insights:
+    get:
+      operationId: getAiInsights
+      tags: [air-quality]
+      summary: Get AI-generated intelligent insights
+      responses:
+        "200":
+          description: AI insights
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiInsights"
+
+  /air-quality/hourly-patterns:
+    get:
+      operationId: getHourlyPatterns
+      tags: [air-quality]
+      summary: Get average pollutant levels by hour of day
+      parameters:
+        - name: city
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Hourly patterns
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HourlyPattern"
+
+  /air-quality/predictions:
+    post:
+      operationId: createPrediction
+      tags: [air-quality]
+      summary: Generate live AI pollution prediction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PredictionRequest"
+      responses:
+        "200":
+          description: Prediction result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PredictionResult"
+
+  /air-quality/city-comparison:
+    get:
+      operationId: getCityComparison
+      tags: [air-quality]
+      summary: Get multi-city comparison data for radar chart
+      parameters:
+        - name: cities
+          in: query
+          schema:
+            type: string
+          description: Comma-separated list of city names
+      responses:
+        "200":
+          description: City comparison radar data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CityComparisonPoint"
+
 components:
   schemas:
     HealthStatus:
@@ -246,8 +316,7 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
     NationalStats:
       type: object
@@ -270,6 +339,12 @@ components:
           type: string
         cleanestCity:
           type: string
+        dominantSource:
+          type: string
+        weeklyTrend:
+          type: string
+        peakHour:
+          type: integer
       required:
         - avgAqi
         - avgPm25
@@ -280,6 +355,9 @@ components:
         - criticalCities
         - mostPollutedCity
         - cleanestCity
+        - dominantSource
+        - weeklyTrend
+        - peakHour
 
     CityStats:
       type: object
@@ -373,11 +451,7 @@ components:
           type: integer
         offset:
           type: integer
-      required:
-        - data
-        - total
-        - limit
-        - offset
+      required: [data, total, limit, offset]
 
     Spike:
       type: object
@@ -448,11 +522,7 @@ components:
           type: integer
         percentage:
           type: number
-      required:
-        - city
-        - source
-        - count
-        - percentage
+      required: [city, source, count, percentage]
 
     TimelineEntry:
       type: object
@@ -465,10 +535,7 @@ components:
           type: number
         city:
           type: ["string", "null"]
-      required:
-        - date
-        - spikeCount
-        - avgAqi
+      required: [date, spikeCount, avgAqi]
 
     PollutantTrendPoint:
       type: object
@@ -483,11 +550,7 @@ components:
           type: number
         city:
           type: ["string", "null"]
-      required:
-        - date
-        - pm25
-        - pm10
-        - aqi
+      required: [date, pm25, pm10, aqi]
 
     SourceDistributionItem:
       type: object
@@ -498,10 +561,7 @@ components:
           type: integer
         percentage:
           type: number
-      required:
-        - source
-        - count
-        - percentage
+      required: [source, count, percentage]
 
     CityRanking:
       type: object
@@ -528,3 +588,179 @@ components:
         - avgPm25
         - primarySource
         - spikeCount
+
+    AiInsights:
+      type: object
+      properties:
+        mostPollutedCity:
+          type: string
+        cleanestCity:
+          type: string
+        highRiskHour:
+          type: integer
+        highRiskHourAqi:
+          type: number
+        dominantSource:
+          type: string
+        dominantSourcePct:
+          type: number
+        weeklyTrend:
+          type: string
+        weeklyTrendPct:
+          type: number
+        anomalyHotspot:
+          type: string
+        anomalyHotspotCount:
+          type: integer
+        seasonalNote:
+          type: string
+        riskLevel:
+          type: string
+        insights:
+          type: array
+          items:
+            type: object
+            properties:
+              icon:
+                type: string
+              title:
+                type: string
+              detail:
+                type: string
+              severity:
+                type: string
+            required: [icon, title, detail, severity]
+      required:
+        - mostPollutedCity
+        - cleanestCity
+        - highRiskHour
+        - highRiskHourAqi
+        - dominantSource
+        - dominantSourcePct
+        - weeklyTrend
+        - weeklyTrendPct
+        - anomalyHotspot
+        - anomalyHotspotCount
+        - seasonalNote
+        - riskLevel
+        - insights
+
+    HourlyPattern:
+      type: object
+      properties:
+        hour:
+          type: integer
+        pm25:
+          type: number
+        pm10:
+          type: number
+        aqi:
+          type: number
+        city:
+          type: ["string", "null"]
+        isPeak:
+          type: boolean
+      required: [hour, pm25, pm10, aqi, isPeak]
+
+    PredictionRequest:
+      type: object
+      properties:
+        city:
+          type: string
+        targetHour:
+          type: integer
+        daysAhead:
+          type: integer
+        pollutant:
+          type: string
+      required: [city, targetHour, daysAhead, pollutant]
+
+    PredictionResult:
+      type: object
+      properties:
+        city:
+          type: string
+        targetHour:
+          type: integer
+        daysAhead:
+          type: integer
+        pollutant:
+          type: string
+        predictedAqi:
+          type: number
+        predictedPm25:
+          type: number
+        predictedPm10:
+          type: number
+        confidence:
+          type: number
+        severity:
+          type: string
+        trend:
+          type: string
+        riskProbability:
+          type: number
+        recommendation:
+          type: string
+        hourlyForecast:
+          type: array
+          items:
+            type: object
+            properties:
+              hour:
+                type: integer
+              aqi:
+                type: number
+              pm25:
+                type: number
+            required: [hour, aqi, pm25]
+        factors:
+          type: array
+          items:
+            type: object
+            properties:
+              factor:
+                type: string
+              weight:
+                type: number
+              description:
+                type: string
+            required: [factor, weight, description]
+      required:
+        - city
+        - targetHour
+        - daysAhead
+        - pollutant
+        - predictedAqi
+        - predictedPm25
+        - predictedPm10
+        - confidence
+        - severity
+        - trend
+        - riskProbability
+        - recommendation
+        - hourlyForecast
+        - factors
+
+    CityComparisonPoint:
+      type: object
+      properties:
+        metric:
+          type: string
+        Lahore:
+          type: number
+        Karachi:
+          type: number
+        Islamabad:
+          type: number
+        Peshawar:
+          type: number
+        Multan:
+          type: number
+        Faisalabad:
+          type: number
+        Quetta:
+          type: number
+        Rawalpindi:
+          type: number
+      required: [metric]

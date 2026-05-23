@@ -3,7 +3,7 @@
  * Do not edit manually.
  * Api
  * SmogNet Air Quality Intelligence API
- * OpenAPI spec version: 0.1.0
+ * OpenAPI spec version: 0.2.0
  */
 export interface HealthStatus {
   status: string;
@@ -19,6 +19,9 @@ export interface NationalStats {
   criticalCities: number;
   mostPollutedCity: string;
   cleanestCity: string;
+  dominantSource: string;
+  weeklyTrend: string;
+  peakHour: number;
 }
 
 export interface CityStats {
@@ -119,6 +122,87 @@ export interface CityRanking {
   spikeCount: number;
 }
 
+export type AiInsightsInsightsItem = {
+  icon: string;
+  title: string;
+  detail: string;
+  severity: string;
+};
+
+export interface AiInsights {
+  mostPollutedCity: string;
+  cleanestCity: string;
+  highRiskHour: number;
+  highRiskHourAqi: number;
+  dominantSource: string;
+  dominantSourcePct: number;
+  weeklyTrend: string;
+  weeklyTrendPct: number;
+  anomalyHotspot: string;
+  anomalyHotspotCount: number;
+  seasonalNote: string;
+  riskLevel: string;
+  insights: AiInsightsInsightsItem[];
+}
+
+export interface HourlyPattern {
+  hour: number;
+  pm25: number;
+  pm10: number;
+  aqi: number;
+  /** @nullable */
+  city?: string | null;
+  isPeak: boolean;
+}
+
+export interface PredictionRequest {
+  city: string;
+  targetHour: number;
+  daysAhead: number;
+  pollutant: string;
+}
+
+export type PredictionResultHourlyForecastItem = {
+  hour: number;
+  aqi: number;
+  pm25: number;
+};
+
+export type PredictionResultFactorsItem = {
+  factor: string;
+  weight: number;
+  description: string;
+};
+
+export interface PredictionResult {
+  city: string;
+  targetHour: number;
+  daysAhead: number;
+  pollutant: string;
+  predictedAqi: number;
+  predictedPm25: number;
+  predictedPm10: number;
+  confidence: number;
+  severity: string;
+  trend: string;
+  riskProbability: number;
+  recommendation: string;
+  hourlyForecast: PredictionResultHourlyForecastItem[];
+  factors: PredictionResultFactorsItem[];
+}
+
+export interface CityComparisonPoint {
+  metric: string;
+  Lahore?: number;
+  Karachi?: number;
+  Islamabad?: number;
+  Peshawar?: number;
+  Multan?: number;
+  Faisalabad?: number;
+  Quetta?: number;
+  Rawalpindi?: number;
+}
+
 export type GetReadingsParams = {
 city?: string;
 limit?: number;
@@ -151,5 +235,16 @@ days?: number;
 
 export type GetSourceDistributionParams = {
 city?: string;
+};
+
+export type GetHourlyPatternsParams = {
+city?: string;
+};
+
+export type GetCityComparisonParams = {
+/**
+ * Comma-separated list of city names
+ */
+cities?: string;
 };
 

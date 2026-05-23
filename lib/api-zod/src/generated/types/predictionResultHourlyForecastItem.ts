@@ -6,7 +6,8 @@
  * OpenAPI spec version: 0.2.0
  */
 
-export type GetAlertsParams = {
-city?: string;
-severity?: string;
+export type PredictionResultHourlyForecastItem = {
+  hour: number;
+  aqi: number;
+  pm25: number;
 };

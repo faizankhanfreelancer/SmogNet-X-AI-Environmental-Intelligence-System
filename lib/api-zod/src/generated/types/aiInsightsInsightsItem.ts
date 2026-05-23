@@ -6,7 +6,9 @@
  * OpenAPI spec version: 0.2.0
  */
 
-export type GetAlertsParams = {
-city?: string;
-severity?: string;
+export type AiInsightsInsightsItem = {
+  icon: string;
+  title: string;
+  detail: string;
+  severity: string;
 };
