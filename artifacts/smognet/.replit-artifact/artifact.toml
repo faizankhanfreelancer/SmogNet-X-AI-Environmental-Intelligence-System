@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "SmogNet Dashboard"
+version = "1.0.0"
+id = "artifacts/smognet"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25161
+
+[services.development]
+run = "pnpm --filter @workspace/smognet run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/smognet", "run", "build" ]
+publicDir = "artifacts/smognet/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25161"
+BASE_PATH = "/"

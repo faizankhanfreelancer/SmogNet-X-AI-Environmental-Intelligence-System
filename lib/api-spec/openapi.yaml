@@ -3,13 +3,15 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: SmogNet Air Quality Intelligence API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: air-quality
+    description: Air quality data operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,219 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /air-quality/stats:
+    get:
+      operationId: getStats
+      tags: [air-quality]
+      summary: Get national statistics
+      description: National-level air quality KPIs and aggregates
+      responses:
+        "200":
+          description: National statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NationalStats"
+
+  /air-quality/city-stats:
+    get:
+      operationId: getCityStats
+      tags: [air-quality]
+      summary: Get per-city statistics
+      description: Aggregated air quality statistics per city
+      responses:
+        "200":
+          description: City statistics array
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CityStats"
+
+  /air-quality/readings:
+    get:
+      operationId: getReadings
+      tags: [air-quality]
+      summary: Get raw sensor readings (paginated)
+      parameters:
+        - name: city
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: Paginated readings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReadingsPage"
+
+  /air-quality/spikes:
+    get:
+      operationId: getSpikes
+      tags: [air-quality]
+      summary: Get detected anomalies / pollution spikes
+      parameters:
+        - name: city
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: Anomaly spikes array
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Spike"
+
+  /air-quality/alerts:
+    get:
+      operationId: getAlerts
+      tags: [air-quality]
+      summary: Get health alerts
+      parameters:
+        - name: city
+          in: query
+          schema:
+            type: string
+        - name: severity
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Health alerts array
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Alert"
+
+  /air-quality/classifications:
+    get:
+      operationId: getClassifications
+      tags: [air-quality]
+      summary: Get source classifications
+      parameters:
+        - name: city
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Source classification summaries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SourceClassification"
+
+  /air-quality/timeline:
+    get:
+      operationId: getTimeline
+      tags: [air-quality]
+      summary: Get anomaly timeline (hourly spike counts)
+      parameters:
+        - name: city
+          in: query
+          schema:
+            type: string
+        - name: days
+          in: query
+          schema:
+            type: integer
+            default: 30
+      responses:
+        "200":
+          description: Timeline entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TimelineEntry"
+
+  /air-quality/pollutant-trends:
+    get:
+      operationId: getPollutantTrends
+      tags: [air-quality]
+      summary: Get PM2.5 / PM10 / AQI trends over time
+      parameters:
+        - name: city
+          in: query
+          schema:
+            type: string
+        - name: days
+          in: query
+          schema:
+            type: integer
+            default: 30
+      responses:
+        "200":
+          description: Pollutant trend data points
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PollutantTrendPoint"
+
+  /air-quality/source-distribution:
+    get:
+      operationId: getSourceDistribution
+      tags: [air-quality]
+      summary: Get pollution source distribution (for pie chart)
+      parameters:
+        - name: city
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Source distribution summary
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SourceDistributionItem"
+
+  /air-quality/city-rankings:
+    get:
+      operationId: getCityRankings
+      tags: [air-quality]
+      summary: Get cities ranked by average AQI
+      responses:
+        "200":
+          description: Ranked cities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CityRanking"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +249,282 @@ components:
       required:
         - status
 
+    NationalStats:
+      type: object
+      properties:
+        avgAqi:
+          type: number
+        avgPm25:
+          type: number
+        avgPm10:
+          type: number
+        totalReadings:
+          type: integer
+        totalSpikes:
+          type: integer
+        totalAlerts:
+          type: integer
+        criticalCities:
+          type: integer
+        mostPollutedCity:
+          type: string
+        cleanestCity:
+          type: string
+      required:
+        - avgAqi
+        - avgPm25
+        - avgPm10
+        - totalReadings
+        - totalSpikes
+        - totalAlerts
+        - criticalCities
+        - mostPollutedCity
+        - cleanestCity
+
+    CityStats:
+      type: object
+      properties:
+        city:
+          type: string
+        province:
+          type: string
+        avgAqi:
+          type: number
+        avgPm25:
+          type: number
+        avgPm10:
+          type: number
+        avgCo:
+          type: number
+        avgO3:
+          type: number
+        avgNox:
+          type: number
+        spikeCount:
+          type: integer
+        alertCount:
+          type: integer
+        primarySource:
+          type: string
+        readingCount:
+          type: integer
+      required:
+        - city
+        - province
+        - avgAqi
+        - avgPm25
+        - avgPm10
+        - avgCo
+        - avgO3
+        - avgNox
+        - spikeCount
+        - alertCount
+        - primarySource
+        - readingCount
+
+    Reading:
+      type: object
+      properties:
+        id:
+          type: integer
+        city:
+          type: string
+        timestamp:
+          type: string
+        pm25:
+          type: number
+        pm10:
+          type: number
+        aqi:
+          type: number
+        co:
+          type: number
+        o3:
+          type: number
+        nox:
+          type: number
+        temperature:
+          type: number
+        humidity:
+          type: number
+      required:
+        - id
+        - city
+        - timestamp
+        - pm25
+        - pm10
+        - aqi
+        - co
+        - o3
+        - nox
+        - temperature
+        - humidity
+
+    ReadingsPage:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Reading"
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+      required:
+        - data
+        - total
+        - limit
+        - offset
+
+    Spike:
+      type: object
+      properties:
+        id:
+          type: integer
+        readingId:
+          type: integer
+        city:
+          type: string
+        timestamp:
+          type: string
+        method:
+          type: string
+        severity:
+          type: string
+        isAnomaly:
+          type: boolean
+        pm25:
+          type: number
+        aqi:
+          type: number
+      required:
+        - id
+        - readingId
+        - city
+        - timestamp
+        - method
+        - severity
+        - isAnomaly
+        - pm25
+        - aqi
+
+    Alert:
+      type: object
+      properties:
+        id:
+          type: integer
+        city:
+          type: string
+        severity:
+          type: string
+        messageEn:
+          type: string
+        messageUr:
+          type: string
+        source:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - city
+        - severity
+        - messageEn
+        - messageUr
+        - source
+        - createdAt
+
+    SourceClassification:
+      type: object
+      properties:
+        city:
+          type: string
+        source:
+          type: string
+        count:
+          type: integer
+        percentage:
+          type: number
+      required:
+        - city
+        - source
+        - count
+        - percentage
+
+    TimelineEntry:
+      type: object
+      properties:
+        date:
+          type: string
+        spikeCount:
+          type: integer
+        avgAqi:
+          type: number
+        city:
+          type: ["string", "null"]
+      required:
+        - date
+        - spikeCount
+        - avgAqi
+
+    PollutantTrendPoint:
+      type: object
+      properties:
+        date:
+          type: string
+        pm25:
+          type: number
+        pm10:
+          type: number
+        aqi:
+          type: number
+        city:
+          type: ["string", "null"]
+      required:
+        - date
+        - pm25
+        - pm10
+        - aqi
+
+    SourceDistributionItem:
+      type: object
+      properties:
+        source:
+          type: string
+        count:
+          type: integer
+        percentage:
+          type: number
+      required:
+        - source
+        - count
+        - percentage
+
+    CityRanking:
+      type: object
+      properties:
+        rank:
+          type: integer
+        city:
+          type: string
+        province:
+          type: string
+        avgAqi:
+          type: number
+        avgPm25:
+          type: number
+        primarySource:
+          type: string
+        spikeCount:
+          type: integer
+      required:
+        - rank
+        - city
+        - province
+        - avgAqi
+        - avgPm25
+        - primarySource
+        - spikeCount
