@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { 
   useGetStats, 
   getGetStatsQueryKey,
@@ -12,16 +13,59 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { getAqiColor, getSeverityBadgeColor } from "@/lib/aqi";
 
+function LiveTicker({ spikes }: { spikes: Array<{ city: string; aqi: number; severity: string; timestamp: string }> }) {
+  const tickerRef = useRef<HTMLDivElement>(null);
+
+  const items = spikes.slice(0, 20);
+
+  return (
+    <div className="border border-primary/20 bg-card/40 rounded overflow-hidden relative">
+      <div className="flex items-center">
+        <div className="shrink-0 px-3 py-2 bg-primary/10 border-r border-primary/20 font-mono text-[10px] text-primary tracking-widest">
+          LIVE_FEED
+        </div>
+        <div className="overflow-hidden flex-1 relative">
+          <div
+            ref={tickerRef}
+            className="flex gap-8 py-2 px-4 font-mono text-xs whitespace-nowrap animate-[ticker_40s_linear_infinite]"
+            style={{ willChange: "transform" }}
+          >
+            {[...items, ...items].map((spike, i) => (
+              <span key={i} className="inline-flex items-center gap-2 shrink-0">
+                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: getAqiColor(spike.aqi) }} />
+                <span className="text-muted-foreground">{new Date(spike.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+                <span className="font-bold">{spike.city.toUpperCase()}</span>
+                <span style={{ color: getAqiColor(spike.aqi) }}>AQI:{Math.round(spike.aqi)}</span>
+                <span className={`text-[9px] px-1.5 py-0.5 rounded border ${getSeverityBadgeColor(spike.severity)}`}>{spike.severity.toUpperCase()}</span>
+              </span>
+            ))}
+          </div>
+        </div>
+        <div className="shrink-0 px-3 py-2 border-l border-primary/20 font-mono text-[10px] text-muted-foreground">
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping inline-block mr-1" />
+          LIVE
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
-  const { data: stats, isLoading: statsLoading, error: statsError } = useGetStats({ 
-    query: { queryKey: getGetStatsQueryKey() } 
+  const [lastSync, setLastSync] = useState(new Date());
+
+  const { data: stats, isLoading: statsLoading, error: statsError, dataUpdatedAt: statsUpdated } = useGetStats({
+    query: { queryKey: getGetStatsQueryKey(), refetchInterval: 30000 }
   });
   const { data: trends, isLoading: trendsLoading, error: trendsError } = useGetPollutantTrends({
-    query: { queryKey: getGetPollutantTrendsQueryKey() }
+    query: { queryKey: getGetPollutantTrendsQueryKey(), refetchInterval: 30000 }
   });
   const { data: spikes, isLoading: spikesLoading, error: spikesError } = useGetSpikes({
-    query: { queryKey: getGetSpikesQueryKey() }
+    query: { queryKey: getGetSpikesQueryKey(), refetchInterval: 30000 }
   });
+
+  useEffect(() => {
+    if (statsUpdated) setLastSync(new Date(statsUpdated));
+  }, [statsUpdated]);
 
   if (statsLoading || trendsLoading || spikesLoading) return <Layout><LoadingState /></Layout>;
   if (statsError || trendsError || spikesError) return <Layout><ErrorState /></Layout>;
@@ -31,10 +75,16 @@ export default function Home() {
     <Layout>
       <div className="space-y-6">
         <div className="scan-line-container border-b border-primary/20 pb-4 mb-6">
-          <div className="flex items-center gap-3">
-            <h2 className="text-3xl font-bold tracking-tight text-primary">NATIONAL_COMMAND_CENTER</h2>
-            <div className="px-2 py-0.5 rounded text-[10px] bg-red-500/20 text-red-500 border border-red-500/50 animate-pulse font-bold">
-              LIVE
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <h2 className="text-3xl font-bold tracking-tight text-primary">NATIONAL_COMMAND_CENTER</h2>
+              <div className="px-2 py-0.5 rounded text-[10px] bg-red-500/20 text-red-500 border border-red-500/50 animate-pulse font-bold">
+                LIVE
+              </div>
+            </div>
+            <div className="text-[10px] font-mono text-muted-foreground hidden sm:block">
+              LAST_SYNC: <span className="text-primary">{lastSync.toLocaleTimeString()}</span>
+              <span className="ml-2 text-[9px] opacity-60">AUTO_REFRESH: 30S</span>
             </div>
           </div>
           <p className="text-muted-foreground mt-1">Real-time telemetry across 8 designated zones</p>
@@ -86,7 +136,7 @@ export default function Home() {
               <CardTitle className="text-xs font-medium text-muted-foreground font-mono">TOTAL_READINGS</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold font-mono">{stats.totalReadings ? stats.totalReadings.toLocaleString() : '1,048,576'}</div>
+              <div className="text-2xl font-bold font-mono">{stats.totalReadings.toLocaleString()}</div>
             </CardContent>
           </Card>
           <Card className="glass-card border-dashed">
@@ -94,7 +144,7 @@ export default function Home() {
               <CardTitle className="text-xs font-medium text-muted-foreground font-mono">AVG_PM10</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold font-mono">142<span className="text-sm text-muted-foreground ml-1">µg/m³</span></div>
+              <div className="text-2xl font-bold font-mono">{Math.round(stats.avgPm10)}<span className="text-sm text-muted-foreground ml-1">µg/m³</span></div>
             </CardContent>
           </Card>
           <Card className="glass-card border-dashed">
@@ -110,7 +160,7 @@ export default function Home() {
               <CardTitle className="text-xs font-medium text-muted-foreground font-mono">TOTAL_SPIKES (24H)</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-primary font-mono">{stats.totalSpikes || 42}</div>
+              <div className="text-2xl font-bold text-primary font-mono">{stats.totalSpikes}</div>
             </CardContent>
           </Card>
         </div>
@@ -135,14 +185,14 @@ export default function Home() {
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                    <XAxis 
-                      dataKey="date" 
+                    <XAxis
+                      dataKey="date"
                       stroke="hsl(var(--muted-foreground))"
                       fontSize={12}
                       tickFormatter={(val) => new Date(val).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                     />
                     <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                    <Tooltip 
+                    <Tooltip
                       contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', fontFamily: 'monospace' }}
                       itemStyle={{ color: 'hsl(var(--foreground))' }}
                       labelStyle={{ color: 'hsl(var(--muted-foreground))' }}
@@ -152,7 +202,7 @@ export default function Home() {
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
-              
+
               <div className="mt-4 pt-4 border-t border-border grid grid-cols-3 gap-4">
                 <div>
                   <span className="text-xs text-muted-foreground font-mono block">MOST_POLLUTED</span>
@@ -207,6 +257,9 @@ export default function Home() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Live event ticker */}
+        {spikes && spikes.length > 0 && <LiveTicker spikes={spikes} />}
       </div>
     </Layout>
   );

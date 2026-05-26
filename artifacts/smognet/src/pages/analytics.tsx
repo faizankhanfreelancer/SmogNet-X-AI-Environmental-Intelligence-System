@@ -151,7 +151,7 @@ export default function Analytics() {
                         contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', fontFamily: 'monospace' }}
                         cursor={{ fill: 'hsl(var(--muted)/0.2)' }}
                       />
-                      <Bar dataKey="avgAqi" name="Avg AQI" radius={[4, 4, 0, 0]}>
+                      <Bar dataKey="aqi" name="Avg AQI" radius={[4, 4, 0, 0]}>
                         {hourlyPatterns.map((entry, index) => (
                           <Cell 
                             key={`cell-${index}`} 
